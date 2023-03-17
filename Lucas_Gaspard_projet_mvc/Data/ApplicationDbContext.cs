@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Lucas_Gaspard_projet_mvc.Data.Model;
 
 namespace Lucas_Gaspard_projet_mvc.Data
 {
@@ -9,5 +10,6 @@ namespace Lucas_Gaspard_projet_mvc.Data
             : base(options)
         {
         }
+        public DbSet<Products> Products { get; set; } = default!;
     }
 }

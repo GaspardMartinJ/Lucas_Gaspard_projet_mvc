@@ -1,0 +1,48 @@
+﻿@model Lucas_Gaspard_projet_mvc.Data.Model.Products
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Products</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Titre)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Titre)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Fabricant)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Fabricant)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Prix)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Prix)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Info)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Info)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Type)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Type)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
