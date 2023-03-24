@@ -1,6 +1,9 @@
 ﻿using Lucas_Gaspard_projet_mvc.Data;
 using Lucas_Gaspard_projet_mvc.Data.Model;
+using LucasGaspardprojetmvc.Data.Migrations;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.CodeAnalysis.Differencing;
@@ -14,17 +17,20 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
     public class UsersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public UsersController(ApplicationDbContext context)
+        public UsersController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Users
         public async Task<IActionResult> Index()
         {
-            var test = await _context.Users.ToListAsync();
-            //test[0].
+            var users = await _context.Users.ToListAsync();
+            List<(string, ApplicationUser)> userWithRoles = new();
+            users.ForEach(u => userWithRoles.Add((_context.UserRoles.First(ur => ur.UserId == u.Id && ur.RoleId == _context.Roles.FirstOrDefault(r => r.Name == "Administrator")!.Id).ToString(), u)));
             return _context.Users != null ?
                         View(await _context.Users.ToListAsync()) :
                         Problem("Entity set 'ApplicationDbContext.Users'  is null.");
