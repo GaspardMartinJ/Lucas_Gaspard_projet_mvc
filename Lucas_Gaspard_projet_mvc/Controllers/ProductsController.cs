@@ -22,6 +22,7 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
         // GET: Products
         public async Task<IActionResult> Index()
         {
+            
               return _context.Products != null ? 
                           View(await _context.Products.ToListAsync()) :
                           Problem("Entity set 'ApplicationDbContext.Products'  is null.");
@@ -56,7 +57,7 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Titre,Fabricant,Prix,Info,Type")] Products products)
+        public async Task<IActionResult> Create([Bind("Id,Titre,Fabricant,Prix,Info,Type")] Product products)
         {
             if (ModelState.IsValid)
             {
@@ -88,7 +89,7 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Titre,Fabricant,Prix,Info,Type")] Products products)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Titre,Fabricant,Prix,Info,Type")] Product products)
         {
             if (id != products.Id)
             {

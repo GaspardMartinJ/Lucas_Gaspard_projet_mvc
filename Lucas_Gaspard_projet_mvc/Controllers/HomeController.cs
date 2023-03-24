@@ -1,5 +1,7 @@
 ﻿using Lucas_Gaspard_projet_mvc.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Diagnostics;
 
 namespace Lucas_Gaspard_projet_mvc.Controllers
@@ -13,6 +15,7 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
             _logger = logger;
         }
 
+        [Authorize(Roles = "Administrator")]
         public IActionResult Index()
         {
             return View();

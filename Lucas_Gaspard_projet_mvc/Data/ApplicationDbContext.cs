@@ -4,12 +4,12 @@ using Lucas_Gaspard_projet_mvc.Data.Model;
 
 namespace Lucas_Gaspard_projet_mvc.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
-        public DbSet<Products> Products { get; set; } = default!;
+        public DbSet<Product> Products { get; set; } = default!;
     }
 }
