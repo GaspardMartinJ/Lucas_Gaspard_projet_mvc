@@ -28,11 +28,11 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
         // GET: Users
         public async Task<IActionResult> Index()
         {
-            var users = await _context.Users.ToListAsync();
-            List<(string, ApplicationUser)> userWithRoles = new();
-            users.ForEach(u => userWithRoles.Add((_context.UserRoles.First(ur => ur.UserId == u.Id && ur.RoleId == _context.Roles.FirstOrDefault(r => r.Name == "Administrator")!.Id).ToString(), u)));
+            List<ApplicationUser> users = await _context.Users.ToListAsync();
+            List<(string, ApplicationUser)> usersWithRoles = new();
+            users.ForEach(u => usersWithRoles.Add((_context.Roles.First(r => r.Id == _context.UserRoles.First(ur => ur.UserId == u.Id).RoleId).ToString(), u)));
             return _context.Users != null ?
-                        View(await _context.Users.ToListAsync()) :
+                        View(usersWithRoles) :
                         Problem("Entity set 'ApplicationDbContext.Users'  is null.");
         }
 
