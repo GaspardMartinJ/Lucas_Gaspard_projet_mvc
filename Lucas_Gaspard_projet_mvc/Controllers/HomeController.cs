@@ -15,7 +15,6 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
             _logger = logger;
         }
 
-        [Authorize(Roles = "Administrator")]
         public IActionResult Index()
         {
             return View();
