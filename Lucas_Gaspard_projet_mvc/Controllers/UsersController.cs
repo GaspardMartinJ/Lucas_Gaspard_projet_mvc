@@ -19,6 +19,7 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
     [Authorize(Roles = "Administrator")]
     public class UsersController : Controller
     {
+        private readonly List<string> acceptedTypes = new() { "Carrosserie", "Peinture", "Moteur" };
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -74,6 +75,7 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("Id,Type")] ApplicationUser UserType)
         {
+            if (ModelState.IsValid && acceptedTypes.Any(t => t == UserType.Type)) { 
             try
             {
                 ApplicationUser user = await _context.Users.FindAsync(id);
@@ -92,6 +94,8 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
                 throw;
             }
             return RedirectToAction(nameof(Index));
+            }
+            return View(UserType);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Lucas_Gaspard_projet_mvc.Data.Model
@@ -15,6 +16,16 @@ namespace Lucas_Gaspard_projet_mvc.Data.Model
         public string Fabricant { get; set; }
         public int Prix { get; set; }
         public string Info { get; set; }
+
+        //public enum Type
+        //{
+        //    [Description("Carrosserie")]
+        //    Carrosserie,
+        //    [Description("Peinture")]
+        //    Peinture,
+        //    [Description("Moteur")]
+        //    Moteur
+        //}
         public string Type { get; set; }
         //private readonly List<string> _type = new() { "Carrosserie", "Peinture", "Moteur" };
         //public string Type

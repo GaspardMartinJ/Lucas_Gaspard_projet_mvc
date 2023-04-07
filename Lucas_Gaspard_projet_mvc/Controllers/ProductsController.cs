@@ -14,6 +14,7 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
 {
     public class ProductsController : Controller
     {
+        private readonly List<string> acceptedTypes = new() { "Carrosserie", "Peinture", "Moteur" };
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
@@ -70,7 +71,7 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
         [Authorize]
         public async Task<IActionResult> Create([Bind("Id,Titre,Fabricant,Prix,Info,Type")] Product products)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && acceptedTypes.Any(t => t == products.Type))
             {
                 _context.Add(products);
                 await _context.SaveChangesAsync();
@@ -111,7 +112,7 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && acceptedTypes.Any(t => t == products.Type))
             {
                 try
                 {
