@@ -106,24 +106,24 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Titre,Fabricant,Prix,Info,Type")] Product products)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Titre,Fabricant,Prix,Info,Type")] Product product)
         {
-            if (id != products.Id)
+            if (id != product.Id)
             {
                 return NotFound();
             }
 
             ApplicationUser current_user = await _userManager.GetUserAsync(User);
-            if (ModelState.IsValid && (current_user.Type == products.Type || _context.Roles.First(r => r.Id == _context.UserRoles.First(ur => ur.UserId == current_user.Id).RoleId).Name.ToString() == "Administrator"))
+            if (ModelState.IsValid && current_user.Type == _context.Products.Find(p => p.id == product.Id).Type && (current_user.Type == product.Type || _context.Roles.First(r => r.Id == _context.UserRoles.First(ur => ur.UserId == current_user.Id).RoleId).Name.ToString() == "Administrator"))
             {
                 try
                 {
-                    _context.Update(products);
+                    _context.Update(product);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductsExists(products.Id))
+                    if (!ProductsExists(product.Id))
                     {
                         return NotFound();
                     }
@@ -134,7 +134,7 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(products);
+            return View(product);
         }
 
         // GET: Products/Delete/5
