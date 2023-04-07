@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Lucas_Gaspard_projet_mvc.Controllers
@@ -20,6 +21,7 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
     public class UsersController : Controller
     {
         private readonly List<string> acceptedTypes = new() { "Carrosserie", "Peinture", "Moteur" };
+        private readonly List<string> acceptedRoles = new() { "Administrator", "Manager" };
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -60,12 +62,16 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
                 return NotFound();
             }
 
-            var Users = await _context.Users.FindAsync(id);
-            if (Users == null)
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
             {
                 return NotFound();
             }
-            return View(Users);
+            if (_context.Roles.First(r => r.Id == _context.UserRoles.First(ur => ur.UserId == user.Id).RoleId).Name.ToString() == "Administrator")
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            return View(user);
         }
 
         // POST: Users/Edit/5
@@ -73,27 +79,34 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Type")] ApplicationUser UserType)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Type,UserName")] ApplicationUser UserType)
         {
-            if (ModelState.IsValid && acceptedTypes.Any(t => t == UserType.Type)) { 
-            try
+            if (_context.Roles.First(r => r.Id == _context.UserRoles.First(ur => ur.UserId == UserType.Id).RoleId).ToString() == "Administrator")
             {
-                ApplicationUser user = await _context.Users.FindAsync(id);
-                //IdentityUserRole<string> test = new()
-                //{
-                //    UserId = UserType.Id,
-                //    RoleId = _context.Roles.First(r => r.Name == UserType.UserName).Id
-                //};
-                user.Type = UserType.Type;
-                _context.Update(user);
-                //_context.Update(test);
-                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateConcurrencyException)
+            if (ModelState.IsValid && acceptedTypes.Any(t => t == UserType.Type) && acceptedRoles.Any(r => r == UserType.UserName))
             {
-                throw;
-            }
-            return RedirectToAction(nameof(Index));
+                try
+                {
+                    ApplicationUser user = await _context.Users.FindAsync(id);
+                    IdentityUserRole<string> test = new()
+                    {
+                        UserId = UserType.Id,
+                        RoleId = _context.Roles.First(r => r.Name == UserType.UserName).Id
+                    };
+                    user.Type = UserType.Type;
+                    _context.Update(user);
+                    _context.UserRoles.RemoveRange(_context.UserRoles.Where(ur => ur.UserId == UserType.Id));
+                    _context.UserRoles.Add(test);
+   
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    throw;
+                }
+                return RedirectToAction(nameof(Index));
             }
             return View(UserType);
         }

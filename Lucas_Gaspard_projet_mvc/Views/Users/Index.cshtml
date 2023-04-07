@@ -46,7 +46,10 @@
                     @Html.DisplayFor(modelItem => item.Item1)
             </td>
             <td>
-                    <a asp-action="Edit" asp-route-id="@item.Item2.Id">Edit</a>
+                    @if (item.Item1 != "Administrator")
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Item2.Id">Edit</a>
+                    }
             </td>
         </tr>
 }

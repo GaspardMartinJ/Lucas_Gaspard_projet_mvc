@@ -7,7 +7,7 @@
 <h1>Index</h1>
 
 
-@if (ViewBag.UserType != "")
+@if (ViewBag.UserType != "" || User.IsInRole("Administrator"))
 {
     <p>
         <a asp-action="Create">Create New</a>
@@ -53,7 +53,7 @@
                 @Html.DisplayFor(modelItem => item.Type)
             </td>
             <td>
-                @if (ViewBag.UserType == item.Type)
+                    @if (ViewBag.UserType == item.Type || User.IsInRole("Administrator"))
                 {
                     <nobr>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

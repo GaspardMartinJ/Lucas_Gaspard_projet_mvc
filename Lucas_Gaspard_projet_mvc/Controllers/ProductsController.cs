@@ -9,12 +9,12 @@ using Lucas_Gaspard_projet_mvc.Data;
 using Lucas_Gaspard_projet_mvc.Data.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using LucasGaspardprojetmvc.Data.Migrations;
 
 namespace Lucas_Gaspard_projet_mvc.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly List<string> acceptedTypes = new() { "Carrosserie", "Peinture", "Moteur" };
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
@@ -29,7 +29,7 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
         {
             ApplicationUser current_user = await _userManager.GetUserAsync(User);
             ViewBag.UserType = current_user?.Type ?? "";
-            return _context.Products != null ? 
+            return _context.Products != null ?
                         View(await _context.Products.ToListAsync()) :
                         Problem("Entity set 'ApplicationDbContext.Products'  is null.");
         }
@@ -71,7 +71,8 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
         [Authorize]
         public async Task<IActionResult> Create([Bind("Id,Titre,Fabricant,Prix,Info,Type")] Product products)
         {
-            if (ModelState.IsValid && acceptedTypes.Any(t => t == products.Type))
+            ApplicationUser current_user = await _userManager.GetUserAsync(User);
+            if (ModelState.IsValid && (current_user.Type == products.Type || _context.Roles.First(r => r.Id == _context.UserRoles.First(ur => ur.UserId == current_user.Id).RoleId).Name.ToString() == "Administrator"))
             {
                 _context.Add(products);
                 await _context.SaveChangesAsync();
@@ -112,7 +113,8 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid && acceptedTypes.Any(t => t == products.Type))
+            ApplicationUser current_user = await _userManager.GetUserAsync(User);
+            if (ModelState.IsValid && (current_user.Type == products.Type || _context.Roles.First(r => r.Id == _context.UserRoles.First(ur => ur.UserId == current_user.Id).RoleId).Name.ToString() == "Administrator"))
             {
                 try
                 {
@@ -169,14 +171,14 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
             {
                 _context.Products.Remove(products);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProductsExists(int id)
         {
-          return (_context.Products?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Products?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
