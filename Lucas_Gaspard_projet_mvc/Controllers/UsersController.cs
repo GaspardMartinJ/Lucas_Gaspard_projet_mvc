@@ -51,24 +51,6 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
                         Problem("Entity set 'ApplicationDbContext.Users'  is null.");
         }
 
-        // GET: Users/Details/5
-        public async Task<IActionResult> Details(string? id)
-        {
-            if (id == null || _context.Users == null)
-            {
-                return NotFound();
-            }
-
-            var Users = await _context.Users
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (Users == null)
-            {
-                return NotFound();
-            }
-
-            return View(Users);
-        }
-
         // GET: Users/Edit/5
         public async Task<IActionResult> Edit(string? id)
         {
@@ -95,8 +77,14 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
             try
             {
                 ApplicationUser user = await _context.Users.FindAsync(id);
+                //IdentityUserRole<string> test = new()
+                //{
+                //    UserId = UserType.Id,
+                //    RoleId = _context.Roles.First(r => r.Name == UserType.UserName).Id
+                //};
                 user.Type = UserType.Type;
                 _context.Update(user);
+                //_context.Update(test);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -104,11 +92,6 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
                 throw;
             }
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool UsersExists(string id)
-        {
-            return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
