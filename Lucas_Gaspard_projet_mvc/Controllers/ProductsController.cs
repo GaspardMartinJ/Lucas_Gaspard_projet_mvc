@@ -72,7 +72,7 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
         public async Task<IActionResult> Create([Bind("Id,Titre,Fabricant,Prix,Info,Type")] Product products)
         {
             ApplicationUser current_user = await _userManager.GetUserAsync(User);
-            if (ModelState.IsValid && (current_user.Type == products.Type || _context.Roles.First(r => r.Id == _context.UserRoles.First(ur => ur.UserId == current_user.Id).RoleId).Name.ToString() == "Administrator"))
+            if (ModelState.IsValid && (current_user.Type == products.Type || User.IsInRole("Administrator")))
             {
                 _context.Add(products);
                 await _context.SaveChangesAsync();
@@ -92,12 +92,16 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
                 return NotFound();
             }
 
-            var products = await _context.Products.FindAsync(id);
-            if (products == null)
+            var product = await _context.Products.FindAsync(id);
+            if (current_user.Type != product.Type && !User.IsInRole("Administrator"))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            if (product == null)
             {
                 return NotFound();
             }
-            return View(products);
+            return View(product);
         }
 
         // POST: Products/Edit/5
@@ -114,7 +118,7 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
             }
 
             ApplicationUser current_user = await _userManager.GetUserAsync(User);
-            if (ModelState.IsValid && current_user.Type == _context.Products.Find(p => p.id == product.Id).Type && (current_user.Type == product.Type || _context.Roles.First(r => r.Id == _context.UserRoles.First(ur => ur.UserId == current_user.Id).RoleId).Name.ToString() == "Administrator"))
+            if (ModelState.IsValid && _context.Products.Any(p => p.Type == product.Type) && (current_user.Type == product.Type || User.IsInRole("Administrator")))
             {
                 try
                 {
@@ -145,15 +149,19 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
             {
                 return NotFound();
             }
+            ApplicationUser current_user = await _userManager.GetUserAsync(User);
 
-            var products = await _context.Products
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (products == null)
+            var product = await _context.Products.FirstOrDefaultAsync(m => m.Id == id);
+            if (current_user.Type != product.Type && !User.IsInRole("Administrator"))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            if (product == null)
             {
                 return NotFound();
             }
 
-            return View(products);
+            return View(product);
         }
 
         // POST: Products/Delete/5
@@ -166,13 +174,19 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
             {
                 return Problem("Entity set 'ApplicationDbContext.Products'  is null.");
             }
-            var products = await _context.Products.FindAsync(id);
-            if (products != null)
-            {
-                _context.Products.Remove(products);
-            }
 
-            await _context.SaveChangesAsync();
+            var product = await _context.Products.FindAsync(id);
+            ApplicationUser current_user = await _userManager.GetUserAsync(User);
+            if (ModelState.IsValid && _context.Products.Any(p => p.Type == product.Type) && (current_user.Type == product.Type || User.IsInRole("Administrator")))
+            {
+                if (product != null)
+                {
+                    _context.Products.Remove(product);
+                }
+
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+                }
             return RedirectToAction(nameof(Index));
         }
 
