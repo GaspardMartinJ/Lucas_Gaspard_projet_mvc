@@ -118,7 +118,8 @@ namespace Lucas_Gaspard_projet_mvc.Controllers
             }
 
             ApplicationUser current_user = await _userManager.GetUserAsync(User);
-            if (ModelState.IsValid && _context.Products.Any(p => p.Type == product.Type) && (current_user.Type == product.Type || User.IsInRole("Administrator")))
+            var oldProdType = await _context.Products.Where(p => p.Id == id).Select(p => p.Type).FirstOrDefaultAsync();
+            if (ModelState.IsValid && oldProdType == product.Type && (current_user.Type == product.Type || User.IsInRole("Administrator")))
             {
                 try
                 {
